@@ -4,26 +4,42 @@ using UnityEngine;
 [Serializable]
 public class Pooltype
 {
-    [SerializeField]float curhealth;
-    float maxhealth;
+    [SerializeField]float curVal;
+    float Max_Value;
 
-    float getvalue01=>curhealth/maxhealth;
+    public float getvalue=>curVal;
+   public float getvalue01=>curVal/Max_Value;
 
+    public float get_MaxValue=>Max_Value;
+    bool cap_max;
     public Pooltype(float maxval,bool startfull=true)
     {
-        maxhealth=maxval;
-        curhealth=startfull?maxhealth:0;
+        Max_Value=maxval;
+        curVal=startfull?Max_Value:0;
+        cap_max=true;
+    }
+
+     public Pooltype(float maxval)
+    {
+        Max_Value=maxval;
+        curVal=Max_Value;
+        cap_max=false;
     }
 
     public float AddValue(float value)
     {
-        curhealth=Mathf.Min(curhealth+value,maxhealth);
-        return curhealth;
+        curVal=cap_max?Mathf.Min(curVal+value,Max_Value):curVal+value;
+        return curVal;
+    }
+
+    public void Setvalue(float value)
+    {
+        curVal=value;
     }
 
      public bool Try_RemoveValue(float value)
     {
-        if (curhealth >= value)
+        if (curVal >= value)
         {
             Remove_Value(value);
             return true;
@@ -34,86 +50,23 @@ public class Pooltype
 
      public float Remove_Value(float value)
     {
-        curhealth=Mathf.Max(curhealth-value,0);
-        return curhealth;
+        curVal=Mathf.Max(curVal-value,0);
+        return curVal;
     }
 
     public float SetFull()
     {
-        curhealth=maxhealth;
-        return curhealth;
+        curVal=Max_Value;
+        return curVal;
     }
 
     public float SetEmpoty()
     {
-        curhealth=0;
-        return curhealth;
+        curVal=0;
+        return curVal;
     }
 
-    public bool isempty=>curhealth<=0;
-    public bool isfull=>curhealth>=maxhealth;
+    public bool isempty=>curVal<=0;
+    public bool isfull=>curVal>=Max_Value;
 }
 
-
-[Serializable]
-public class Timer_
-{
-    [SerializeField]float cur_Val;
-    float Max_Val;
-    bool countdown;
-
-    float getvalue01=>cur_Val/Max_Val;
-
-    public Timer_(float maxval,bool count_Down=true)
-    {
-        Max_Val=maxval;
-        cur_Val=count_Down?Max_Val:0;
-    }
-
-    public bool UpdateValue(float value)
-    {
-        float changeval=countdown?value*-1:value;
-        cur_Val=Mathf.Min(cur_Val+changeval,Max_Val);
-        
-        return Has_Elasped();
-    }
-
-    public bool Has_Elasped()
-    {
-        if (countdown)
-        {
-            return isempty;
-        }
-       
-            return isfull;
-        
-
-    }
-       
-    public void Reset_TImer()
-    {
-        if (countdown)
-        {
-            SetFull();
-        }
-        else
-        {
-            SetEmpty();
-        }
-    }
-
-    public float SetFull()
-    {
-        cur_Val=Max_Val;
-        return cur_Val;
-    }
-
-    public float SetEmpty()
-    {
-        cur_Val=0;
-        return cur_Val;
-    }
-
-    public bool isempty=>cur_Val<=0;
-    public bool isfull=>cur_Val>=Max_Val;
-}

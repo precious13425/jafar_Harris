@@ -7,15 +7,17 @@ using UnityEngine.UI;
 
 public class Interract_Handler : MonoBehaviour
 {
-    public RectTransform staticCanvas;
     public Player_SO Playerdata;
     public intr_Comp curselected;
     public Camera mycamera;
     [SerializeField]LayerMask _layerMask;
    
     public float drawdis=10;
+    public float check_radius;
     public static Interract_Handler ins;
     public bool isUse_ready;
+    public enum DrawTypr{sphere,line}
+    public DrawTypr drawtype;
 
     [Header("additional subcomponent")]
    // public AimCursor_manager aimCursor_Manager;
@@ -45,7 +47,11 @@ public class Interract_Handler : MonoBehaviour
     void Update()
     {
         //shoot raycast
+       if(drawtype==DrawTypr.line)
         SetCur_Obj(FindCurObj_Raycast());
+        
+       else if(drawtype==DrawTypr.sphere)
+       SetCur_Obj(FindCurObj_Spherecast());
       
     }
 
@@ -71,6 +77,7 @@ public class Interract_Handler : MonoBehaviour
 #region  Current selected functions
     intr_Comp FindCurObj_Raycast()
     {
+       // Debug.Log("LLLLLLLLLLLL");
         Ray Ray=new Ray(mycamera.transform.position,mycamera.transform.forward);
         intr_Comp temp_data=null;
         bool success=Physics.Raycast(Ray,out RaycastHit hit,drawdis,_layerMask);
@@ -80,6 +87,22 @@ public class Interract_Handler : MonoBehaviour
         }
         return temp_data;
     }
+
+
+     intr_Comp FindCurObj_Spherecast()
+    {
+        Ray Ray=new Ray(mycamera.transform.position,mycamera.transform.forward);
+        intr_Comp temp_data=null;
+        bool success=Physics.SphereCast(Ray,check_radius,out RaycastHit hit,drawdis,_layerMask);
+
+        //check if taget has interractable component attached in heirachy
+        if (success)
+        {
+            temp_data=hit.collider.GetComponent<intr_Comp>();
+        }
+        return temp_data;
+    }
+
 
      void SetCur_Obj(intr_Comp data)
     {
@@ -94,11 +117,12 @@ public class Interract_Handler : MonoBehaviour
            
 
             ins.curselected=data;
-            Debug.LogWarning("is selected"+data.name);
+          //  Debug.LogWarning("is selected"+data.name);
             OnValueChanged?.Invoke();
            
         }
     }
+
 
      void SetCur_null()
     {
@@ -120,6 +144,11 @@ public class Interract_Handler : MonoBehaviour
 
         Gizmos.color=Color.yellow;
         Gizmos.DrawLine(mycamera.transform.position,mycamera.transform.position+mycamera.transform.forward*drawdis);
+        if (drawtype == DrawTypr.sphere)
+        {
+          Gizmos.DrawWireSphere(mycamera.transform.position,check_radius);
+          Gizmos.DrawWireSphere(mycamera.transform.position+mycamera.transform.forward*drawdis,check_radius);  
+        }
     }
 
 #endregion

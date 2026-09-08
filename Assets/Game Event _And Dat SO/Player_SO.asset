@@ -12,5 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae8b1af353ed2484d9815f6f43085587, type: 3}
   m_Name: Player_SO
   m_EditorClassIdentifier: 
-  healthVal:
-    curhealth: 0
+  PlayerPrefab: {fileID: 6742962590244551332, guid: 3a73285ed092f9e458a20aeec0baf6f5,
+    type: 3}
+  Bullet_count_start: 10
+  Health_Start: 4

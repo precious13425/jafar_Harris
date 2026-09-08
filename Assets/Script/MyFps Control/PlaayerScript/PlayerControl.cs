@@ -55,7 +55,7 @@ public class PlayerControl : MonoBehaviour
 
 
 // handle the footstop sound and delay
-        float _footstepDelay;
+       [SerializeField] float _footstepDelay;
         AudioSource _audioSource;
         float footstep_et = 0;
 

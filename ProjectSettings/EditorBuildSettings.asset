@@ -6,8 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Script/Level_LoaSystem/Main_Menu.unity
-    guid: 6dca3dce62d31f34a8906766d1613c95
+    path: Assets/main menu.unity
+    guid: b0a0a9873a387a047911cf5b4ff70019
   - enabled: 1
     path: Assets/greybox.unity
     guid: ce644d21cfb0c744bb17c384f6df4a58

@@ -1,19 +1,13 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.Video;
 
-public interface IMover
-{
-    void SetMoveDir(Vector3 dir, float speed);
-    void SetRotDir(Vector3 dir, float speed);
 
-    void StopMove();
-}
 
-public class RbodyMover : MonoBehaviour, IMover
+public class RbodyMover : MonoBehaviour, ImovePos
 {
     public Rigidbody rbody;
    [SerializeField] Vector3 forward_dir;
@@ -22,7 +16,7 @@ public class RbodyMover : MonoBehaviour, IMover
   [SerializeField]float gravmod=3;
   [SerializeField]float vertialvel=0;
 
-    public void SetMoveDir(Vector3 dir, float speed)
+    public void SetMovePosition(Vector3 dir, float speed)
     {
        forward_dir=dir.normalized.ZeroY();
        movespeed=speed;
@@ -48,11 +42,6 @@ public class RbodyMover : MonoBehaviour, IMover
 
    
     
-
-    public void SetRotDir(Vector3 dir, float speed)
-    {
-        
-    }
 
     public void StopMove()
     {

@@ -22,7 +22,7 @@ public class ActionHitBox : MonoBehaviour
     float checktime=1,c_timer=0;
 
 
-    public void Setup(Transform roottransform, Vector3 facedir, float range)
+    public void Setup(Transform roottransform, float range=-1)
     {
       if(range>0) attack_range=range;
       
@@ -31,12 +31,13 @@ public class ActionHitBox : MonoBehaviour
             myroot_transform=roottransform;
         }
         
+        buffer=new Collider[12];
     }
 
 
     //runthis logic at update
     Collider[]buffer;
-    public void Doaction(Transform T)
+    void Doaction()
     {
 
        var attackdata=Jf_Utils.GetHit_atPoint(transform.position,hitLayer,buffer,attack_range);
@@ -46,6 +47,7 @@ public class ActionHitBox : MonoBehaviour
         {
             foreach (var gm in attackdata.resultHit)
             {
+              
               OnUnitHit?.Invoke(gm);
 
               //this part goes to the brain to decide
@@ -62,12 +64,13 @@ public class ActionHitBox : MonoBehaviour
     }
 
 
-    public void CallAction(Transform target)
+    //already has target in his sight using just a lazy dis check
+    public void CallAction()
     {
+        var buffer=new Collider[13];
         c_timer=checktime;
         ischecking=true;
         attackedenemies.Clear();
-        var buffer=new Collider[13];
 
     }
 
@@ -85,7 +88,7 @@ public class ActionHitBox : MonoBehaviour
             EndAction();
         }
 
-
+        Doaction();
 
      }
 
@@ -96,15 +99,16 @@ public class ActionHitBox : MonoBehaviour
     }
 
 
+ 
     
 
-
-    
-
-
+[SerializeField]bool showgizmos;
 [SerializeField]Color gizcolor=Color.blue;
     void OnDrawGizmosSelected()
     {
+        if(!showgizmos)
+        return;
+
         Gizmos.color=gizcolor;
         Gizmos.DrawWireSphere(transform.position,attack_range);
     }

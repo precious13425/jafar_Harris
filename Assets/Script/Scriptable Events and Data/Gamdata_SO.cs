@@ -8,8 +8,9 @@ using UnityEngine.Playables;
 public class Gamdata_SO : ScriptableObject
 {
 
-    
-
+    [SerializeField] float Savedcoin_amount;
+    [NonSerialized] public Pooltype Coin;
+    [SerializeField]Player_SO playerT;
 
     public bool isPlay{get;private set;}
    
@@ -25,6 +26,11 @@ public class Gamdata_SO : ScriptableObject
         isPlay=true;
         Cursor.lockState=CursorLockMode.Locked;
 
+    }
+
+    internal void newGameRun()
+    {
+        Coin=new Pooltype(0);
     }
 
     

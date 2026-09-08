@@ -202,10 +202,9 @@ public static class Jf_Utils
 
     #endregion
 
- public static (bool success,List<Transform> resultHit) GetHit_atPoint(Vector3 center,LayerMask hitlayer,Collider[]mubuffer,float radius=1)
+ public static (bool success,List<Transform> resultHit) GetHit_atPoint(Vector3 center,LayerMask hitlayer,Collider[]buffer,float radius=1)
     {
         Vector3 returnhit=Vector3.zero;
-        var buffer=mubuffer;
 
        
         var dm=Physics.OverlapSphereNonAlloc(center,radius,buffer,hitlayer);
@@ -236,6 +235,77 @@ public static class Jf_Utils
     }
 
    
+[Serializable]
+public class Jf_timer
+{
+    [SerializeField]float cur_Val;
+    float Max_Val;
+    bool countdown;
+
+    float getvalue01=>cur_Val/Max_Val;
+
+    public Jf_timer(float maxval,bool count_Down=true)
+    {
+        this.countdown=count_Down;
+        Max_Val=maxval;
+        cur_Val=count_Down?Max_Val:0;
+    }
+
+    public bool UpdateTimer_bool(float value)
+    {
+            if (countdown)
+            {
+                cur_Val-=value;
+            }
+            else
+            {
+                cur_Val+=value;
+            }
+
+        return Has_Elasped();
+    }
+
+    public bool Has_Elasped()
+    {
+        if (countdown)
+        {
+            return isempty;
+        }
+       
+            return isfull;
+        
+
+    }
+       
+    public Jf_timer Reset_TImer()
+    {
+        if (countdown)
+        {
+            SetFull();
+        }
+        else
+        {
+            SetEmpty();
+        }
+        return this;
+    }
+
+    public Jf_timer SetFull()
+    {
+        cur_Val=Max_Val;
+        return this;
+    }
+
+    public Jf_timer SetEmpty()
+    {
+        cur_Val=0;
+        return this;
+    }
+
+    public bool isempty=>cur_Val<=0;
+    public bool isfull=>cur_Val>=Max_Val;
+}
+
 
 }
 
@@ -352,4 +422,23 @@ public class MouseInput
    
 
    
+}
+
+
+public class Jf_Singleton<T> : MonoBehaviour where T:MonoBehaviour
+{
+    public static T ins;
+
+    void Awake()
+    {
+        if (ins != null)
+        {
+            Destroy(this);
+            return;
+        }
+        ins= this as T;
+    }
+
+
+
 }

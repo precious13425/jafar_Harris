@@ -11,10 +11,10 @@ public class FootStepHandler : MonoBehaviour
 
     public void PlayFootstepSounds(float delay)
     {
-        PlayFootstepSounds(delay,true);
+        Play_FootstepSounds(delay);
     }
     
-    public void PlayFootstepSounds(float delay,bool isgrounded)
+    void Play_FootstepSounds(float delay)
     {
            
 

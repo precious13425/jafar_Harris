@@ -1,15 +1,17 @@
+using System;
 using UnityEngine;
 
 public class Shoot_Listner : MonoBehaviour
 {
-    public Interract_Handler handler;
+    [SerializeField]Shoot_Component shoot_Component;
+    Interract_Handler handler;
     //public damageHandler damager;
 
     public Transform Target;
 
     void Start()
     {
-         handler=Interract_Handler.ins;
+        handler=Interract_Handler.ins;
     }
 
     public void DOShoot()
@@ -17,9 +19,11 @@ public class Shoot_Listner : MonoBehaviour
        var tmpdata=handler.curselected;
         Transform target=tmpdata?tmpdata.transform:null;
 
-       handler.OnRangeAction?.Invoke(target);
+       shoot_Component.HandleTarget(target);
        
     }
 
+
+   
 
 }

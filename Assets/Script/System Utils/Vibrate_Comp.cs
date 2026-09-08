@@ -36,7 +36,7 @@ public class Vibrate_Comp : MonoBehaviour
    
     void Doaction()
     {
-        
+        originpos=transform.position;
 
         if (!isvibrating)
         {

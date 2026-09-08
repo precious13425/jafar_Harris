@@ -5,19 +5,31 @@ using UnityEngine.Events;
 //handles the effects part 
 public class Shoot_Component : MonoBehaviour
 {
+    [SerializeField]PlayerManager manager;
     public GameEvent Shootevent;
     //public damageHandler damager;
     public UnityEvent OnShoot_Start;
     public float shoot_rate=.5f;
-    Timer_ shoottimer;
+    Jf_Utils.Jf_timer shoottimer;
     bool Shoot_ready=true;
     bool applydamage=true;
 
+    public float bulletcount
+    {
+        get
+        {
+            if (manager && manager.playerdata!=null)
+            {
+             return manager.playerdata.current_bulletcount.getvalue;  
+            }
+            return 1;
+        }
+        
+    }
     void Start()
     {
          Shootevent.Register(DOShoot);
-         shoottimer=new Timer_(shoot_rate);
-         Interract_Handler.ins.OnRangeAction+=HandleTarget;
+         shoottimer=new Jf_Utils.Jf_timer(shoot_rate);
     }
 
   
@@ -26,7 +38,7 @@ public class Shoot_Component : MonoBehaviour
     {
         if (!Shoot_ready)
         {
-            if (shoottimer.UpdateValue(Time.deltaTime))
+            if (shoottimer.UpdateTimer_bool(Time.deltaTime))
             {
                 Shoot_ready=true;
                 applydamage=true;
@@ -36,34 +48,47 @@ public class Shoot_Component : MonoBehaviour
         }
     }
 
-    private void DOShoot()
+    
+
+    public void DOShoot()
     {
         if(!Shoot_ready)
         return;
+        if(bulletcount<=0)
+        return;
+
         Shoot_ready=false;
+        USeBullet(1);
         OnShoot_Start?.Invoke();
         Debug.LogWarning(Time.time+"??"+name);
     }
 
-      private void HandleTarget(Transform target)
+
+   void USeBullet(float value)
     {
-        // if(!applydamage)
-        // return;
-        // applydamage=false;
-       var result=DamageHandler.CheckDamage(target);
-        if (result.isvalid)
+        if (manager && manager.playerdata!=null)
         {
-            result.target.Take_Damage(1);
+            manager.playerdata.current_bulletcount.Remove_Value(value); 
         }
-        Debug.LogWarning("Do_Dmg");
     }
 
     void OnDisable()
     {
         Shootevent.UnRegister(DOShoot);
-        Interract_Handler.ins.OnRangeAction-=HandleTarget;
 
 
+    }
+
+    public void HandleTarget(Transform target)
+    {
+        
+      Endarg?.Invoke(target);
+    }
+
+    System.Action<Transform>Endarg;
+     public void SetUp(System.Action<Transform>handleTarget)
+    {
+        Endarg=handleTarget;
     }
 }
 
@@ -85,6 +110,8 @@ public class DamageHandler
 
 public interface Idamagable
 {
+    bool Is_alive();
+    void Revive();
     void Take_Damage(float val);
     Transform GetTransform();
 }
