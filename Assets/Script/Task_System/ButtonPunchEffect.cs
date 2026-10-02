@@ -63,6 +63,28 @@ public class ButtonPunchEffect : MonoBehaviour
         currentRoutine = StartCoroutine(AnimateTo(targetScale, targetPosition));
     }
 
+    public void Do_infiniteLoop()
+    {
+         if (currentRoutine != null)
+            StopCoroutine(currentRoutine);
+
+        Vector3 targetScale = useScale ? originalScale * scaleMultiplier : rectTransform.localScale;
+        Vector2 targetPosition = useMove ? originalPosition + new Vector2(-moveLeftAmount, 0f) : rectTransform.anchoredPosition;
+
+        currentRoutine = StartCoroutine(Play_InfinteLoop(targetScale, targetPosition));
+    }
+   
+    public void StopLoop()
+    {
+         if (currentRoutine != null)
+            StopCoroutine(currentRoutine);
+       
+        rectTransform.localScale = originalScale;
+        rectTransform.anchoredPosition = originalPosition;
+    }
+
+        
+
     IEnumerator AnimateTo(Vector3 targetScale, Vector2 targetPosition)
     {
         Vector3 startScale = rectTransform.localScale;
@@ -118,5 +140,17 @@ public class ButtonPunchEffect : MonoBehaviour
 
         ResetEffect();
     }
+
+
+    IEnumerator Play_InfinteLoop(Vector3 targetscale,Vector2 targetpos)
+    {
+        while (true)
+        {
+            yield return AnimateTo(targetscale,targetpos);
+            yield return AnimateTo(originalScale,originalPosition);
+        }
+    }
+
+
 
 }

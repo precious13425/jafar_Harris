@@ -12,6 +12,9 @@ public class Enemy_SO : ScriptableObject
    public GameObject PlayerPrefab;
     public int unitid;
     [SerializeField] float Enemy_Attack_Dmg,Health_Start;
+
+    [Header("Rewards")]
+    public float bulletrewardbase=1,coinrewardbase=1;
     
     public Pooltype GEt_health(float level)
     {

@@ -13,13 +13,17 @@ public class ActionHitBox : MonoBehaviour
     Transform myroot_transform;
    
    [SerializeField] LayerMask hitLayer;
+    [SerializeField] UnityEvent OnTargetHit;
+
     public Queue<Transform> attackedenemies=new Queue<Transform>();
     
     public System.Action<Transform>OnUnitHit;
 
+
 //chck for target to damage
     bool ischecking;
     float checktime=1,c_timer=0;
+    public bool usetime=true;
 
 
     public void Setup(Transform roottransform, float range=-1)
@@ -39,7 +43,7 @@ public class ActionHitBox : MonoBehaviour
     Collider[]buffer;
     void Doaction()
     {
-
+        
        var attackdata=Jf_Utils.GetHit_atPoint(transform.position,hitLayer,buffer,attack_range);
            
          
@@ -48,13 +52,15 @@ public class ActionHitBox : MonoBehaviour
             foreach (var gm in attackdata.resultHit)
             {
               
-              OnUnitHit?.Invoke(gm);
 
               //this part goes to the brain to decide
                 if(gm==myroot_transform || attackedenemies.Contains(gm))
                 continue;
 
+                OnUnitHit?.Invoke(gm);
                 attackedenemies.Enqueue(gm);
+                OnTargetHit?.Invoke();
+                Debug.Log("i hit"+ gm.name);
 
                 //
             } 
@@ -67,10 +73,20 @@ public class ActionHitBox : MonoBehaviour
     //already has target in his sight using just a lazy dis check
     public void CallAction()
     {
-        var buffer=new Collider[13];
+        buffer=new Collider[13];
         c_timer=checktime;
         ischecking=true;
         attackedenemies.Clear();
+        usetime=true;
+
+    }
+
+     public void StartAction(System.Action<Transform>endarg)
+    {
+        CallAction();
+        usetime=false;
+        OnUnitHit=endarg;
+
 
     }
 
@@ -82,7 +98,7 @@ public class ActionHitBox : MonoBehaviour
         
         //handles countdown
         c_timer-=Time.deltaTime;
-        if (c_timer <= 0)
+        if (c_timer <= 0 && usetime)
         {
             ischecking=false;
             EndAction();

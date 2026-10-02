@@ -8,7 +8,8 @@ public class Pooltype
     float Max_Value;
 
     public float getvalue=>curVal;
-   public float getvalue01=>curVal/Max_Value;
+
+   public float GetnormalizedValue=>curVal/Max_Value;
 
     public float get_MaxValue=>Max_Value;
     bool cap_max;
@@ -60,7 +61,7 @@ public class Pooltype
         return curVal;
     }
 
-    public float SetEmpoty()
+    public float SetEmpty()
     {
         curVal=0;
         return curVal;
@@ -68,5 +69,6 @@ public class Pooltype
 
     public bool isempty=>curVal<=0;
     public bool isfull=>curVal>=Max_Value;
+
 }
 

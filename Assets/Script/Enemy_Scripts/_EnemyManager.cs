@@ -7,117 +7,62 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class _EnemyManager : MonoBehaviour,Idamagable
+public class _EnemyManager : MonoBehaviour,Ireward_able
 {
 
    #region  Variables
    public Enemy_SO enemy_SO;
-   [field:SerializeField]public bool isperformingaction{get;private set;}
-    [Header("health Variables")]
-   [SerializeField]bool isover;
-    [SerializeField]float healthval;
-    public Pooltype energy;
-    public UnityEvent OnHurt,OnDead;
-   [SerializeField]float att_time=2;
-   [SerializeField]Jf_Utils.Jf_timer attack_timer;
-   //JfCorutine jfCorutine=new JfCorutine();
-
-
-    [Header("Attack Variables")]
-    public bool attackready;
-    [SerializeField]float Damage_Amount=1,dis_toAttack=3;
-   public MelleSwing actionHitBox;
    [SerializeField]Player_SO target;
-   Transform getTarget;
+   public bool usedchasemove;
 
-    [Header("Hud Variables")]
-    public Slider healthslider;
-    public TMP_Text healthtext;
-    public CanvasGroup healthcanvas;
-    public Coroutine fadecorutine;
-   
+   [Header("health Variables")]
+   public bool isAiActive;
+    [SerializeField]float healthval;
+    public StatDamager_COmp mystats;
+   public Transform getTarget=>target.GetPlayer;
 
-    [Header("chase Variable")]
-   [SerializeField] navMover mover;
-   [SerializeField] float chaseSpeed=3;
-   [SerializeField] FootStepHandler footstep;
-   [SerializeField]float footstepdelay=0.5f;
+
 
 #endregion
 
-   public float endval;
    IEnumerator Start()
     {
       yield return null;
 
-      energy= enemy_SO?enemy_SO.GEt_health(Level):new Pooltype(healthval);
-      Damage_Amount=enemy_SO?enemy_SO.Get_AttackValue(Level):Damage_Amount;
+      isAiActive=true;
 
-      attack_timer=new Jf_Utils.Jf_timer(att_time);
 
-      if (target)
+      //setuphealth
+      mystats.OnValChange+=Handle_Damage;
+      mystats.SetUp(healthval);
+      
+
+    }
+  
+    public void Handle_Damage()
+    {
+      if (mystats.Is_alive())
       {
-         getTarget=target.GetPlayer;
-         
+         isAiActive=false;
+         StaticUpdater.DelayedCall(()=>isAiActive=true,2);
       }
-
-      //setup attack hitbox
-      actionHitBox.SetUp(HandleTarget);
-      UpdateHealth();
-
       
 
     }
 
-
-    public Transform GetTransform()
-    {
-       return transform;
-    }
-
-    public void Take_Damage(float val)
-    {
-       energy.Remove_Value(1);
-       OnHurt?.Invoke();
-      if (energy.isempty)
-      {
-         
-       OnDead?.Invoke();
-       OnEnemyKilled?.Invoke(enemy_SO.unitid);
-      }
-
-      //send event
-
-      UpdateHealth();
-      // Debug.Log(Time.time);
-    
-    }
-
-    public bool Is_alive()
-    {
-       return !energy.isempty;
-    }
-
-    public void Revive()
-    {
-       energy.SetFull();
-    }
+    public void UpdateKillQUest()=>OnEnemyKilled?.Invoke(enemy_SO.unitid);
 
 
-    void Update()
-    {
-      if(isover)
-      return;
+   /*
 
+   public virtual void DOLogic()
+   {
       UpdateAttackTime();
 
-      if(isperformingaction)
-      return;
-
-
+      
       TryAttack();
       TryMove();
-    }
+   }
 
    void UpdateAttackTime()
    {
@@ -131,7 +76,7 @@ public class _EnemyManager : MonoBehaviour,Idamagable
 
    void TryMove()
    {
-      if (distanceToPlayer > dis_toAttack)
+      if (distanceToPlayer > dis_toAttack && usedchasemove)
       {
          mover.SetMovePosition(target.GetPlayer.position,chaseSpeed);
          footstep.PlayFootstepSounds(footstepdelay);  
@@ -145,6 +90,7 @@ public class _EnemyManager : MonoBehaviour,Idamagable
 
       if (actionHitBox && attackready)
       {
+        // usedchasemove=false;
          attackready=false;
          actionHitBox.DOShoot();
          attack_timer.Reset_TImer();
@@ -153,6 +99,10 @@ public class _EnemyManager : MonoBehaviour,Idamagable
       
    }
 
+*/
+
+
+#region  Others
    public static System.Action<int> OnEnemyKilled;
 
     public void HandleTarget(Transform target)
@@ -164,45 +114,18 @@ public class _EnemyManager : MonoBehaviour,Idamagable
             
          //check if target exist
         if(result.target!=null)
-            result.target.Take_Damage(Damage_Amount);
+            result.target.Take_Damage(4);
         
         //check if target is still alive
         if (!result.target.Is_alive())
       {
-        isover=true;
+        isAiActive=true;
       }
       
     }
 
-#region  other health
-   public void UpdateHealth()
-    {
-      if (energy.isempty)
-         {
-           StopAllCoroutines();
-         healthcanvas.alpha=0;
-         isover=true;
-         return;
-         //show GameOver
-         }
 
-
-       healthcanvas.alpha=1;
-         healthslider.value=energy.getvalue01; 
-         healthtext.text=$"{energy.getvalue}/{energy.get_MaxValue}";
-
-           
-      if (fadecorutine != null)
-      {
-         StopCoroutine(fadecorutine);
-      }
-      fadecorutine=StartCoroutine(JfCorutine.LerpValue2(healthcanvas,0,3));
-
-
-       
-    }
-
-    float distanceToPlayer
+   public float distanceToPlayer
    {
       get
       {
@@ -223,43 +146,32 @@ public class _EnemyManager : MonoBehaviour,Idamagable
        return player_T;
     }
 
-    public void SetUp(Enemy_SO data,float level)
+   void SetUp(Enemy_SO data,float level)
    {
       this.Level=level;
       this.enemy_SO=data;
    }
 
-   public (float coin,float bullet_Mod) GetRewardval()
+   public (float coin,float bullet) GetRewardval()
    {
-      float coin=energy.get_MaxValue*0.5f;
-      return (coin,Level);
+      return (Mathf.Max(1,enemy_SO.coinrewardbase*Level),Mathf.Max(1,enemy_SO.bulletrewardbase));
          
    }
-#endregion
+
+    public void Revive()
+    {
+      mystats.SetUp(healthval);
+      isAiActive=true;
+    }
+
+  
+    #endregion
+
+}
+
+public interface Ireward_able
+{
+   (float coin, float bullet) GetRewardval();
+}
 
    
-}
-
-public class JfCorutine
-{
-  
-  
-
-    public  static IEnumerator LerpValue2(CanvasGroup retval,float targetval,float duration,System.Action Onend=null)
-     {
-        float timer=0;
-        float startval=retval.alpha;
-        while (timer < duration)
-        {
-            timer+=Time.deltaTime;
-            retval.alpha=Mathf.Lerp(startval,targetval,timer/duration);
-            Debug.Log(retval+"|||....");
-            yield return null;
-        }
-      
-        Onend?.Invoke();
-        
-    }
-}
-
-

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,17 +7,19 @@ using UnityEngine.Events;
 public class MelleSwing : MonoBehaviour
 {
     //public damageHandler damager;
-    public UnityEvent OnSwingStart;
-    public float shoot_rate=.5f;
+    public UnityEvent OnSwingStart,OnKilledTarget;
+    public float shoot_rate=.5f,attack_recovery=0.2f;
     Jf_Utils.Jf_timer attacktimer;
     bool swing_ready=true;
-    bool applydamage=true;
+   
 
-    System.Action<Transform>Endarg;
+    public System.Action Onendarg;
+
+    System.Action<Transform>get_Target;
+    public bool usetime=true;
     void Start()
     {
         attacktimer=new Jf_Utils.Jf_timer(shoot_rate);
-       Melle_Listner.OnValueChange+=HandleTarget;
     }
 
   
@@ -25,19 +28,18 @@ public class MelleSwing : MonoBehaviour
     {
         if (!swing_ready)
         {
-            if (attacktimer.UpdateTimer_bool(Time.deltaTime))
+            if (attacktimer.UpdateTimer_bool(Time.deltaTime) && usetime)
             {
                 swing_ready=true;
-                applydamage=true;
                 attacktimer.Reset_TImer();
             }
             
         }
     }
 
-    public void SetUp(System.Action<Transform>handleTarget)
+    public void SetUp(System.Action<Transform>handleTarget,System.Action endattack=null)
     {
-        Endarg=handleTarget;
+        get_Target=handleTarget;
     }
 
     public void DOShoot()
@@ -48,20 +50,30 @@ public class MelleSwing : MonoBehaviour
 
         swing_ready=false;
         OnSwingStart?.Invoke();
+        Invoke(nameof(endattack),attack_recovery);
        // Debug.LogWarning(Time.time+"??"+name);
+    }
+
+    private void endattack()
+    {
+       Onendarg?.Invoke();
+        if (!usetime)
+        {
+            swing_ready=true;
+
+        }
     }
 
     public void HandleTarget(Transform target)
     {
-       Endarg?.Invoke(target);
-      
+       get_Target?.Invoke(target);
        // result=(false,null);
     }
 
-    void OnDisable()
+   
+
+    internal void DOKill()
     {
-        Melle_Listner.OnValueChange-=HandleTarget;
-
-
+       OnKilledTarget?.Invoke();
     }
 }

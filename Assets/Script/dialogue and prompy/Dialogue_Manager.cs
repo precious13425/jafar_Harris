@@ -10,6 +10,8 @@ public class Dialogue_Manager : MonoBehaviour
     public DialoguePanel dialoguevisuals,Full_dialogueMessage;
     public PromptSystem promptSystem;
     public DialogueSystem dialogueSystem;
+    [SerializeField]DialoguePanel taskUi;
+
 
    
     #region  MessagePrompt
@@ -170,6 +172,13 @@ private void ValueChanged2(DialoguePanel panel)
     }
 
 
+    void OnDestroy()
+    {
+        dialoguevisuals.Onvaluechanged-=ValueChanged;
+
+        Full_dialogueMessage.Onvaluechanged-=ValueChanged2;
+
+    }
 
 
 }
@@ -184,12 +193,15 @@ public abstract class UIbase:MonoBehaviour
 
     public virtual void SetDetail(string d,float alpha_s=1)
     {
+        if(detail_text)
         detail_text.text=$"{d}";
+
         setalpha(alpha_s);
     }
 
     public virtual void setalpha(float alpha_s)
     {
+        if(ParentCanvas)
         ParentCanvas.alpha=alpha_s;
     }
 

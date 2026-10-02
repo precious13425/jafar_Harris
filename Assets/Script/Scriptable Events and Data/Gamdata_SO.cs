@@ -8,12 +8,15 @@ using UnityEngine.Playables;
 public class Gamdata_SO : ScriptableObject
 {
 
-    [SerializeField] float Savedcoin_amount;
-    [NonSerialized] public Pooltype Coin;
+    public Pooltype Coinsaved;
     [SerializeField]Player_SO playerT;
+    public static bool isaggro;
 
-    public bool isPlay{get;private set;}
+    public  bool isPlay{get;private set;}
+
+    public System.Action OnBulletChange,OnCoinChange;
    
+    public bool isnewgame;
 
     public void PauseGame()
     {
@@ -28,10 +31,21 @@ public class Gamdata_SO : ScriptableObject
 
     }
 
+    public void SetNewgtame(bool val)=>isnewgame=val;
     internal void newGameRun()
     {
-        Coin=new Pooltype(0);
+      
     }
 
-    
+    internal void SaveCoin()
+    {
+      //Coinsaved.AddValue(runcoin);
+    }
+
+    internal void SpendCoin(int payCost)
+    {
+        Coinsaved.Remove_Value(payCost);
+        OnCoinChange?.Invoke();
+
+    }
 }

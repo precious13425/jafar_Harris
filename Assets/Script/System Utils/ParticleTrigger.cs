@@ -16,6 +16,11 @@ public class ParticleTrigger : MonoBehaviour
 
 
     public void StartVFX(){
+        if (!myparticle)
+        {
+            myparticle=GetComponent<ParticleSystem>(); 
+        }
+        
         StopVFX();
         myparticle.gameObject.SetActive(true);
         myparticle?.Play();

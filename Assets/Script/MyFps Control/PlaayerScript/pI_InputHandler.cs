@@ -37,7 +37,7 @@ public class pI_InputHandler : MonoBehaviour
         vInput = Input.GetAxisRaw(VerticalInput);
 
         //for the interraction
-        if (Input.GetKeyDown(useKey) || Input.GetKey(useKey))
+        if (Input.GetKeyDown(useKey))
         {
           activeWepon_so?.OnRaise();
           Debug.LogWarning("First input");

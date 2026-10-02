@@ -6,7 +6,7 @@ public class RBPosition : MonoBehaviour
 {
    
     public Transform Roottransform;
-    Vector3 movedir,Rotdir;
+   Vector3 movedir,Rotdir;
     float movespeed,rotspeed;
     [SerializeField]float decelerationspeed=2;
     

@@ -10,26 +10,29 @@ public class AmbientLoopSwitcher : MonoBehaviour
     public AudioSource escalatingambience;
     public AudioSource climaxambience;
 
+   
+
 
     void Start()
     {
-        TaskManager.ins.OnStateChange+=HandleStateChange;
         DisableAll();
+        GameDirector.ins.OnStateChange+=HandleStateChange;
+        HandleStateChange(GameDirector.GameSate.calm);
     }
 
-    private void HandleStateChange(TaskManager.GameSate sate)
+    private void HandleStateChange(GameDirector.GameSate sate)
     {
         DisableAll();
         switch (sate)
         {
-           case TaskManager.GameSate.calm:
+           case GameDirector.GameSate.calm:
            CalmAmbient.Play(); 
            break;
-           case TaskManager.GameSate.excalation:
+           case GameDirector.GameSate.excalation:
+            case GameDirector.GameSate.climax:
            escalatingambience.Play();
            break;
-            case TaskManager.GameSate.climax:
-           climaxambience.Play();
+           case GameDirector.GameSate.boss:
            break;
         }
     }

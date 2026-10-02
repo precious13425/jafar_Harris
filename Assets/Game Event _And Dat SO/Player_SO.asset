@@ -14,5 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerPrefab: {fileID: 6742962590244551332, guid: 3a73285ed092f9e458a20aeec0baf6f5,
     type: 3}
+  playerLevel: 1
   Bullet_count_start: 10
   Health_Start: 4
+  gundamage: 3
+  axedamage: 1
+  staminastart: 12
+  axe_StaminaCost: 2

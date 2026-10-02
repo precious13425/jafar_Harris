@@ -3,10 +3,11 @@ using UnityEngine;
 public class Melle_Listner : MonoBehaviour
 {
    [SerializeField] MelleSwing melleSwing;
-    public static event System.Action<Transform>OnValueChange;
     public LayerMask layerMask;
     public float attackradius=1;
     public Transform attackpoint;
+    public System.Action<Transform> on_HasTarget;
+
    
     public void DOShoot()
     {
@@ -17,7 +18,8 @@ public class Melle_Listner : MonoBehaviour
         {
             foreach (var enemy in retval)
             {
-               melleSwing.HandleTarget(enemy.transform); 
+               melleSwing.HandleTarget(enemy.transform);
+               on_HasTarget?.Invoke(enemy.transform);
             }
         }
     }

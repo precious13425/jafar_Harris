@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class DialoguePanel : UIbase
 {
@@ -7,12 +8,14 @@ public class DialoguePanel : UIbase
     public bool fadeout=false;
     public float fadetime=3;
     
+    public UnityEvent OnEventCall;
      float startval;
 
     public override void SetDetail(string d, float alpha_s = 1)
     {
         base.SetDetail(d, alpha_s);
         startval=ParentCanvas.alpha;
+        OnEventCall?.Invoke();
     }
 
     public void Callnext(){

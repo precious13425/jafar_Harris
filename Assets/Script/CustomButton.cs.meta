@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 7774c7a22bcdbb346b879086411d9b10
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - m_TargetGraphic: {instanceID: 0}
+  - normalSprite: {fileID: 21300000, guid: b54f2b638f4552c469c2ef2a1bea92ed, type: 3}
+  - hoverSprite: {fileID: 21300000, guid: 5f4dfe7ddc9a2724c934b7251abc836e, type: 3}
+  - pressedSprite: {fileID: 21300000, guid: a7790d6a5f02e1047ad3dc387ac055a1, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

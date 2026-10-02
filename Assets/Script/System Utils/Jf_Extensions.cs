@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Video;
 
 public  static  class Jf_Extensions
@@ -185,7 +186,7 @@ public static class Jf_Utils
 
     #endregion
 
-     #region  spherecast CheckDistance
+    #region  spherecast CheckDistance
     public static RaycastHit Can_move(Vector3 origin,Vector3 direction,float maxdis,float radius,LayerMask collide_mask)
     {
         
@@ -202,7 +203,7 @@ public static class Jf_Utils
 
     #endregion
 
- public static (bool success,List<Transform> resultHit) GetHit_atPoint(Vector3 center,LayerMask hitlayer,Collider[]buffer,float radius=1)
+    public static (bool success,List<Transform> resultHit) GetHit_atPoint(Vector3 center,LayerMask hitlayer,Collider[]buffer,float radius=1)
     {
         Vector3 returnhit=Vector3.zero;
 
@@ -234,7 +235,107 @@ public static class Jf_Utils
         return false;
     }
 
+
+#region  JfInput
+
+    
+    ////
+    ////
+    ///require othographic camera 
+    //
+    public static Vector2 GetInput_othographic(Camera kam)
+    {
+        Vector2 mouseinput=Vector2.zero;
+        var dm=kam.ScreenToWorldPoint(Input.mousePosition);
+            mouseinput=dm;
+
+        return mouseinput;
+    }
+
+    public static (bool left,bool down) ScreenCheckPosition(Vector3 testpos)
+    {
+        var dm=Camera.main.ScreenToViewportPoint(testpos);
+        bool isleft=dm.x<0.5f;
+        bool isdown=dm.y<0.5f;
+
+        return (isleft,isdown);
+    }
+
+
+   //this accounts for terrain height
+    public static (bool success,Vector3 hitpoint,Collider hitcollider) raycastHit(Vector3 startpoint,Vector3 direction)
+    {
+        
+        bool success=false;
+        Vector3 returnhit=Vector3.zero;
+        RaycastHit hit;
+        Collider hitcollider=null;
+       // RaycastHit[] hitall;
+        //var Ray=Camera.main.ScreenPointToRay(Input.mousePosition);
+        var  Ray=new Ray(startpoint,direction);
+        success=Physics.Raycast(Ray,out hit,1000f);
+        if (success)
+        {
+            returnhit=hit.point;
+            hitcollider=hit.collider;
+        }
+
+        return(success,returnhit,hitcollider);
+    }
+
+
+    public static (bool success,Vector3 hitpoint,Collider hitcollider) GetMouseHit_Point(LayerMask hitlayer)
+    {
+        bool success=false;
+        Vector3 returnhit=Vector3.zero;
+        RaycastHit hit;
+        Collider hitcollider=null;
+       // RaycastHit[] hitall;
+        var Ray=Camera.main.ScreenPointToRay(Input.mousePosition);
+        
+        var nm=raycastHit(Ray.origin,Ray.direction);
+
+        success=Physics.Raycast(Ray,out hit,1000f,hitlayer);
+        if (success)
+        {
+            returnhit=hit.point;
+            hitcollider=hit.collider;
+        }
+
+        return(success,returnhit,hitcollider);
+    }
+
+
+     public static (bool success,List<Transform> resultHit) GetMouseHit_Targets(LayerMask hitlayer,float radius=1)
+    {
+        Vector3 returnhit=Vector3.zero;
+        RaycastHit[] buffer=new RaycastHit[10];
+
+        //gets ray fromcamera screenpoint
+        var Ray=Camera.main.ScreenPointToRay(Input.mousePosition);
    
+       
+        var dm=Physics.SphereCastNonAlloc(Ray,radius,buffer,1000,hitlayer);
+
+        //adds to all list
+        List<Transform> allhitTransform=new List<Transform>();
+        for (int i = 0; i < buffer.Length; i++)
+        {
+            
+            allhitTransform.Add(buffer[i].transform);
+        }
+
+        return(allhitTransform.Count>0,allhitTransform);
+    }
+
+  
+    public static bool IspointerOverUI()
+    {
+        bool isover=EventSystem.current.IsPointerOverGameObject();
+        return isover;
+    }
+
+#endregion
 [Serializable]
 public class Jf_timer
 {
@@ -262,11 +363,13 @@ public class Jf_timer
                 cur_Val+=value;
             }
 
+
         return Has_Elasped();
     }
 
     public bool Has_Elasped()
     {
+        cur_Val=Mathf.Max(0,cur_Val);
         if (countdown)
         {
             return isempty;
@@ -310,6 +413,32 @@ public class Jf_timer
 }
 
 
+public class JfCorutine
+{
+  
+  
+
+    public  static IEnumerator LerpCanvas_Alpha(CanvasGroup retval,float targetval,float duration,System.Action Onend=null)
+     {
+        float timer=0;
+        float startval=retval.alpha;
+        while (timer < duration)
+        {
+            timer+=Time.deltaTime;
+            retval.alpha=Mathf.Lerp(startval,targetval,timer/duration);
+            Debug.Log(retval+"|||....");
+            yield return null;
+        }
+      
+        Onend?.Invoke();
+        
+    }
+
+}
+
+
+
+
 //random dice function to check probability
  public static class JfDIce
 {
@@ -329,79 +458,11 @@ public class Jf_timer
     public static int diceRollCap(int dicefaceCount,float mincap)=>(int)UnityEngine.Random.Range(mincap,dicefaceCount+1);
 
 }
-
-  
+ 
  
  [Serializable]
 public class MouseInput
-{
-    public LayerMask groundlayer;
-
-   
-   
-   //this accounts for terrain height
-    public (bool success,Vector3 hitpoint,Collider hitcollider) GetMouseHit(Vector3 startpoint,Vector3 direction)
-    {
-        
-        bool success=false;
-        Vector3 returnhit=Vector3.zero;
-        RaycastHit hit;
-        Collider hitcollider=null;
-       // RaycastHit[] hitall;
-        //var Ray=Camera.main.ScreenPointToRay(Input.mousePosition);
-        var  Ray=new Ray(startpoint,direction);
-        success=Physics.Raycast(Ray,out hit,1000f);
-        if (success)
-        {
-            returnhit=hit.point;
-            hitcollider=hit.collider;
-        }
-
-        return(success,returnhit,hitcollider);
-    }
-
-
-    public static (bool success,Vector3 hitpoint,Collider hitcollider) GetMouseHit_Point(LayerMask hitlayer)
-    {
-        bool success=false;
-        Vector3 returnhit=Vector3.zero;
-        RaycastHit hit;
-        Collider hitcollider=null;
-       // RaycastHit[] hitall;
-        var Ray=Camera.main.ScreenPointToRay(Input.mousePosition);
-        success=Physics.Raycast(Ray,out hit,1000f,hitlayer);
-        if (success)
-        {
-            returnhit=hit.point;
-            hitcollider=hit.collider;
-        }
-
-        return(success,returnhit,hitcollider);
-    }
-
-     public static (bool success,List<Transform> resultHit) GetMouseHit_Targets(LayerMask hitlayer,float radius=1)
-    {
-        Vector3 returnhit=Vector3.zero;
-        RaycastHit[] buffer=new RaycastHit[10];
-
-        //gets ray fromcamera screenpoint
-        var Ray=Camera.main.ScreenPointToRay(Input.mousePosition);
-   
-       
-        var dm=Physics.SphereCastNonAlloc(Ray,radius,buffer,1000,hitlayer);
-
-        //adds to all list
-        List<Transform> allhitTransform=new List<Transform>();
-        for (int i = 0; i < buffer.Length; i++)
-        {
-            
-            allhitTransform.Add(buffer[i].transform);
-        }
-
-        return(allhitTransform.Count>0,allhitTransform);
-    }
-
-  
+{  
    
 
 //this is a cheaper raycast and shows th epostion of mouse i world object.
@@ -420,16 +481,16 @@ public class MouseInput
     }
 
    
-
+   
    
 }
 
 
-public class Jf_Singleton<T> : MonoBehaviour where T:MonoBehaviour
+public abstract class Jf_Singleton<T> : MonoBehaviour where T:MonoBehaviour
 {
     public static T ins;
 
-    void Awake()
+    public virtual void Awake()
     {
         if (ins != null)
         {
@@ -437,8 +498,14 @@ public class Jf_Singleton<T> : MonoBehaviour where T:MonoBehaviour
             return;
         }
         ins= this as T;
+
+        print("ssdawakecall");
     }
 
+}
 
 
+public static class JfInput
+{
+    
 }

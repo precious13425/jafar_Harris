@@ -7,13 +7,17 @@ public class Bullet : MonoBehaviour
     RangeBox rangeCaller;
 
     //calculate the ditance to disable bullet
-    float range;
+   [SerializeField] float range;
     Vector3 startpos;
-   [SerializeField] bool isactive,ispenetrating;
+   [SerializeField] bool isactive;
     Transform myroot;
     
-    public UnityEvent OnCollideEnd;
+    public UnityEvent OnDistanceReached;
 
+    void Start()
+    {
+        startpos=transform.position;
+    }
 
     public void SetUp(RangeBox rbox,Transform rootT,float maxrange)
     {
@@ -36,41 +40,10 @@ public class Bullet : MonoBehaviour
         {
             Debug.Log("Exceed");
             isactive=false;
-            OnCollideEnd?.Invoke();
+            OnDistanceReached?.Invoke();
         }
     }
-
     
-  void OnTriggerEnter(Collider other)
-    {
-       if (myroot != null)
-        {
-            if(myroot==other.transform)
-            return;
-            
-        }
-
-        if (rangeCaller != null)
-        {
-            // unitEntity enemyvar=other.GetComponent<unitEntity>();
-            // if(enemyvar && rangeCaller)
-            // {
-            //     if (!unitEntity.isValidEnemy(rangeCaller.getEntity(), enemyvar))
-            //     {
-            //         return;
-            //     }
-            // }
-
-            rangeCaller.ProcessTarget(other.transform);
-            if (!ispenetrating)
-            {
-                isactive=false;
-                 OnCollideEnd?.Invoke();
-            }
-        }
-
-    }
-   
-
+  
 }
 

@@ -8,7 +8,6 @@ public class LevelLoad_System : MonoBehaviour
 {
     
     public System.Action OnvalueChange;
-
     public static LevelLoad_System ins;
     //the gamedata
     public SceneFade fadeUi;
@@ -37,7 +36,7 @@ public class LevelLoad_System : MonoBehaviour
         yield return null;
     }
 
-   public void CallScene(int id)
+    public void CallScene(int id)
     {
         fadeUi?.FadeInBlack(fadeintime, () =>
         {
@@ -48,7 +47,7 @@ public class LevelLoad_System : MonoBehaviour
 
     }
 
-     void CallScene(string id)
+    void CallScene(string id)
     {
         fadeUi?.FadeInBlack(fadeintime, () =>
         {
@@ -58,7 +57,7 @@ public class LevelLoad_System : MonoBehaviour
 
     }
 
-     void EmptyFade(bool fadeout=true)
+    void EmptyFade(bool fadeout=true)
     {
         //sets fadeing to or from black variables
        if(fadeout)
@@ -77,17 +76,15 @@ public class LevelLoad_System : MonoBehaviour
 
     }
 
-
     public static void  FadeInScene(int id)
     {
         ins?.CallScene(id);
     }
 
-     public static void  FadeInScene(string id)
+    public static void  FadeInScene(string id)
     {
         ins?.CallScene(id);
     }
-
 
     public void QuitGame()=>Application.Quit();
 

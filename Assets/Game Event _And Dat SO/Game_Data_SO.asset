@@ -12,3 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c90207cfbd90414dbe7daf2775f11de, type: 3}
   m_Name: Game_Data_SO
   m_EditorClassIdentifier: 
+  Coinsaved:
+    curVal: 20
+  playerT: {fileID: 11400000, guid: 5f4822aa97f6cf846bcfeaefc2a0dd9b, type: 2}

@@ -6,13 +6,15 @@ using UnityEngine.Events;
 public class Shoot_Component : MonoBehaviour
 {
     [SerializeField]PlayerManager manager;
-    public GameEvent Shootevent;
+    
     //public damageHandler damager;
-    public UnityEvent OnShoot_Start;
-    public float shoot_rate=.5f;
+    public UnityEvent OnShoot_Start,OnKilledTarget;
+    public float shoot_rate=.5f,attack_recovery=0.1f;
     Jf_Utils.Jf_timer shoottimer;
     bool Shoot_ready=true;
     bool applydamage=true;
+
+    public System.Action Onendarg;
 
     public float bulletcount
     {
@@ -28,7 +30,6 @@ public class Shoot_Component : MonoBehaviour
     }
     void Start()
     {
-         Shootevent.Register(DOShoot);
          shoottimer=new Jf_Utils.Jf_timer(shoot_rate);
     }
 
@@ -61,34 +62,41 @@ public class Shoot_Component : MonoBehaviour
         USeBullet(1);
         OnShoot_Start?.Invoke();
         Debug.LogWarning(Time.time+"??"+name);
+        Invoke(nameof(endattack),attack_recovery);
+       // Debug.LogWarning(Time.time+"??"+name);
     }
 
+    private void endattack()
+    {
+       Onendarg?.Invoke();
+    }
 
    void USeBullet(float value)
     {
         if (manager && manager.playerdata!=null)
         {
             manager.playerdata.current_bulletcount.Remove_Value(value); 
+            manager.gamdata_SO.OnBulletChange?.Invoke();
         }
     }
 
-    void OnDisable()
-    {
-        Shootevent.UnRegister(DOShoot);
-
-
-    }
+ 
 
     public void HandleTarget(Transform target)
     {
         
-      Endarg?.Invoke(target);
+      has_Target?.Invoke(target);
     }
 
-    System.Action<Transform>Endarg;
+    System.Action<Transform>has_Target;
      public void SetUp(System.Action<Transform>handleTarget)
     {
-        Endarg=handleTarget;
+        has_Target=handleTarget;
+    }
+
+     internal void DOKill()
+    {
+       OnKilledTarget?.Invoke();
     }
 }
 
@@ -111,7 +119,6 @@ public class DamageHandler
 public interface Idamagable
 {
     bool Is_alive();
-    void Revive();
     void Take_Damage(float val);
     Transform GetTransform();
 }

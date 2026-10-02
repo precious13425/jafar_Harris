@@ -7,167 +7,60 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class TaskManager : MonoBehaviour
+public class TaskManager : Jf_Singleton<TaskManager>
 {
-    #region variables
-    taskSystem taskSystem;
-   [SerializeField] Gamdata_SO gamedata_SO;
-    public Enemy_SO starttask;
-    public float amount=4;
-    public System.Action OnChange;
 
-    public DialoguePanel taskUi;
-   [SerializeField] SPawnerHandler enemyspawner;
-
-
- #region  gamestate
-    public GameSate gameSate;
-    public enum  GameSate
-    {
-        calm,excalation,climax,end
-    }
-
-    public UnityEvent Calm,Excalating,Climax,End;
-
- private void ChangeGamestate(GameSate data)
-    {
-       gameSate=data;
-
-       OnStateChange?.Invoke(gameSate);
-       switch (gameSate)
-        {
-            case GameSate.calm:
-               Calm?.Invoke();
-               //timer.Reset_TImer();
-            break;
-            case GameSate.excalation:
-            Excalating?.Invoke();
-            break;
-
-             case GameSate.climax:
-            Climax?.Invoke();
-            break;
-            case GameSate.end:
-            End?.Invoke();
-            break;
-        }
-            
-            
-    }
-#endregion
-
-
-    public System.Action<GameSate>OnStateChange;
-
-
-
-    public static TaskManager ins;
-
-#endregion
-
-     void Awake()
-    {
-        if(ins==null)
-        {
-        ins=this;
-        return;
-        }
-        Destroy(this);
-    }
-    
+   public System.Action OnUpdateTask;
+    Gamdata_SO gamedata_SO;
+   //[SerializeField]DialoguePanel taskUi;
+   public float enemyKillcount;
 
     IEnumerator Start()
     {
-        taskSystem=new taskSystem();
-        taskSystem.Setuptask(starttask.unitid,excalationmax-1);
+        //_taskSystem=new taskSystem();
+       // _taskSystem.Setuptask(starttask.unitid,excalationmax-1);
         _EnemyManager.OnEnemyKilled+=Checktask;
-        canupdate=true;
-        UpdateUi();
-        timer=new Jf_Utils.Jf_timer(10,true);
-        
         yield return new WaitForSeconds(1);
-        ChangeGamestate(GameSate.calm);
+        //canupdate=true;
+        UpdateUi();
+        enemyKillcount=0;
+        
 
     }
 
+//check foe enemy killed
     public void Checktask(int id)
     {
-        taskSystem.TryAdd(id);
-        if (taskSystem.is_Taskcomplete())
-        {
-           // taskSystem.GiveReward();
-          //  taskSystem.clearTask();
-            //add new task in next 5 second
-           if(canupdate)
-           StartCoroutine(nexttask());
-
-        }
-        OnChange?.Invoke();
-        UpdateUi();
+      
+      
         
-        enemykillcount++;
+        enemyKillcount++;
+        OnUpdateTask?.Invoke();
        
     }
 
-[SerializeField]Jf_Utils.Jf_timer timer;
-public float enemykillcount=0;
-public float excalationmax=10;
-public float climaxmax=10;
-
-    void Update()
-    {
-        switch (gameSate)
-        {
-            case GameSate.calm:
-                if (timer.UpdateTimer_bool(Time.deltaTime))
-                {
-                    ChangeGamestate(GameSate.excalation);
-                   
-                   
-                }
-            break;
-            case GameSate.excalation:
-            bool done=enemykillcount>excalationmax;
-                if (done)
-                {
-                    enemykillcount=0;
-                    ChangeGamestate(GameSate.climax);
-                }
-            break;
-
-             case GameSate.climax:
-            bool isdone=enemykillcount>excalationmax;
-                if (isdone)
-                {
-                    enemykillcount=0;
-                    ChangeGamestate(GameSate.end);
-                }
-            break;
-            
-            
-        }
-    }
-
-   
-
+/*
+    //a quest system prototype for killquest
+    
+    taskSystem   _taskSystem;
     [SerializeField]bool canupdate;
     [SerializeField]float waittime=5;
     IEnumerator nexttask()
     {
 
-        gamedata_SO.Coin.AddValue(taskSystem.GetReward());
+        gamedata_SO.Coin.AddValue(_taskSystem.GetReward());
         yield return new WaitForSeconds(waittime);
 
-         taskSystem.Setuptask(starttask.unitid,amount);
+         _taskSystem.Setuptask(starttask.unitid,amount);
          canupdate=true;
          UpdateUi();
-    }
+    }*/
 
     void UpdateUi()
     {
         // Debug.LogWarning("Enemy killed +"+taskSystem);
-        string detail_text=$"{taskSystem.TaskDetail()}";
-        taskUi.SetDetail(detail_text);
+       // string detail_text=$"x {enemyKillcount}";
+       // taskUi.SetDetail(detail_text);
     }
 
 
